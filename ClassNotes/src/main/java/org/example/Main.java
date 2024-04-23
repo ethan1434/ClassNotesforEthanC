@@ -1,9 +1,12 @@
 package org.example;
 
+import input.InputUtils;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.io.*;
+import kong.unirest.Unirest;
 
 import static input.InputUtils.intInput;
 import static input.InputUtils.stringInput;
@@ -19,12 +22,12 @@ public class Main {
             "5. Media hashmap\n" +
             "6. Files and exceptions\n" +
             "7. OOP\n" +
-            "8. GUI (no code yet)\n" +
-            "9. Database (no code yet)\n" +
-            "10. APIs (no code yet)\n" +
+            "8. Dog park calculator\n" +
+            "9. Database maker\n" +
+            "10. Useless fact\n" +
             "0. Quit";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
 
         int selection;
 
@@ -46,7 +49,13 @@ public class Main {
                 createAFile();
             } else if (selection == 7) {
                 OOPNoteMaker();
-            } else if (selection == 0) {
+            } else if (selection == 8) {
+                noteGUI();
+            } else if (selection == 9) {
+                dbMaker();
+            } else if (selection == 10){
+                apiGetter();
+            }else if (selection == 0) {
                 break;
             } else {
                 System.out.println("Invalid choice, please try again");
@@ -60,7 +69,7 @@ public class Main {
         System.out.println("Here's your quote: " + saying.repeat(times));
     }
 
-    public static  void bananaMath() {
+    public static void bananaMath() {
         int dimesAndDollars = intInput("How many banana bunches are you buying? ");
         boolean moneyMoney = expenses(dimesAndDollars);
         if (moneyMoney) {
@@ -69,6 +78,7 @@ public class Main {
             System.out.println("You are paying a good amount for bananas! :)");
         }
     }
+
     public static boolean expenses(int amountOfBananas) {
         return amountOfBananas > 3;
     }
@@ -79,7 +89,8 @@ public class Main {
         String repeated = repeatThePhrase(phrasing, counter);
         System.out.println(repeated);
     }
-    public static String repeatThePhrase(String phrasing, int counter){
+
+    public static String repeatThePhrase(String phrasing, int counter) {
         return phrasing + phrasing.repeat(Math.max(0, counter));
     }
 
@@ -91,6 +102,7 @@ public class Main {
             System.out.print(fruitList);
         }
     }
+
     public static List<String> fruitCount() {
 
         List<String> fruitList = new ArrayList<>();
@@ -101,37 +113,38 @@ public class Main {
             fruitList.add(whatFruit);
         }
 
-        if(fruitList.isEmpty()){
+        if (fruitList.isEmpty()) {
             boolean confirm = yesNoInput("The list is empty.  Are you sure you want to continue?");
-            if(!confirm){
+            if (!confirm) {
                 fruitCount();
             }
         }
         return fruitList;
     }
 
-    public static void mediaHashmap(){
+    public static void mediaHashmap() {
         HashMap<String, String> favoriteMediaList = favoriteMedia();
-        if (favoriteMediaList.isEmpty()){
+        if (favoriteMediaList.isEmpty()) {
             System.out.println("The HashMap is empty.");
         } else {
             System.out.println(favoriteMediaList);
         }
     }
+
     public static HashMap<String, String> favoriteMedia() {
 
         HashMap<String, String> mediaList = new HashMap<>();
         System.out.println("Let's build a HashMap of your favorite media!\nPlease enter the name of the media and what form it is in when prompted!");
 
-        while(yesNoInput("Add more?")) {
+        while (yesNoInput("Add more?")) {
             String mediaName = stringInput("Name: ");
             String mediaForm = stringInput("Form: ");
             mediaList.put(mediaName, mediaForm);
         }
 
-        if(mediaList.isEmpty()){
+        if (mediaList.isEmpty()) {
             boolean confirm = yesNoInput("The HashMap is empty.  Are you sure you want to continue?");
-            if (!confirm){
+            if (!confirm) {
                 favoriteMedia();
             }
         }
@@ -141,7 +154,7 @@ public class Main {
     public static void createAFile() {
         System.out.println("Let's make a file to write in!");
         String nameOfFile = stringInput("What is the file's name?");
-        if (!nameOfFile.contains(".txt")){
+        if (!nameOfFile.contains(".txt")) {
             System.out.println("Please end the filename with '.txt'");
             createAFile();
         }
@@ -149,14 +162,14 @@ public class Main {
         try {
             FileWriter infoFile = new FileWriter(nameOfFile);
             BufferedWriter buffering = new BufferedWriter(infoFile);
-            while(yesNoInput("Write a new line?")) {
+            while (yesNoInput("Write a new line?")) {
                 String lineWriter = stringInput("Enter text to put into the file: ");
                 buffering.write(lineWriter + "\n");
             }
             infoFile.close();
             buffering.close();
 
-            if(yesNoInput("Do you want to review what you wrote?")) {
+            if (yesNoInput("Do you want to review what you wrote?")) {
                 FileReader reading = new FileReader(nameOfFile);
                 System.out.println(reading);
                 reading.close();
@@ -166,7 +179,7 @@ public class Main {
         }
     }
 
-    public static void OOPNoteMaker(){
+    public static void OOPNoteMaker() {
         ArrayList<OOP> noteList = new ArrayList<>();
 
         do {
@@ -176,14 +189,14 @@ public class Main {
             noteList.add(newOOP(name, note));
         } while (yesNoInput("Add another item and note?"));
 
-        if(yesNoInput("Do you wish to review your notes?")){
-            for(OOP i : noteList) {
+        if (yesNoInput("Do you wish to review your notes?")) {
+            for (OOP i : noteList) {
                 System.out.println(i + "\n");
             }
         }
     }
 
-    public static OOP newOOP(String itemName, String itemNote){
+    public static OOP newOOP(String itemName, String itemNote) {
 
         OOP newItem = new OOP(itemName, itemNote);
 
@@ -191,5 +204,41 @@ public class Main {
         newItem.setNote(itemNote);
 
         return newItem;
+    }
+
+    public static void noteGUI() {
+        NoteGUI gui = new NoteGUI();
+    }
+
+    public static void dbMaker() throws SQLException {
+        System.out.println("Let's build a database!");
+
+        String dbName = "jdbc:sqlite:newDB.db";
+        DBMaker.dbCreation(dbName);
+        do {
+            String itemName = InputUtils.stringInput("Item name:");
+            String itemNote = InputUtils.stringInput("Note about item:");
+            DBMaker.main(dbName, itemName, itemNote);
+
+        } while (yesNoInput("Add more items?"));
+    }
+
+    public static void apiGetter() {
+        String uselessFact = getUselessFact();
+        System.out.println(uselessFact);
+    }
+
+    private static String getUselessFact(){
+        String url = "https://uselessfacts.jsph.pl/api/v2/facts/random";
+        UselessFact uselessFact = Unirest.get(url).asObject(UselessFact.class).getBody();
+        return uselessFact.text;
+    }
+}
+
+class UselessFact {
+    public String text;
+
+    public UselessFact(String uselessFact) {
+        this.text = uselessFact;
     }
 }
